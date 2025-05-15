@@ -10,10 +10,10 @@ extern "C"
 
     /// @brief Calculate mean of data.
     /// mean = 1/N * sum(x)
-    /// @param data 
-    /// @param len 
-    /// @return 
-    float math_mean(const float* data, int len)
+    /// @param data
+    /// @param len
+    /// @return
+    float math_mean(const float *data, int len)
     {
         float mean = 0.0f;
         for (int i = 0; i < len; i++)
@@ -24,10 +24,10 @@ extern "C"
 
     /// @brief Calculate standard deviation of data.
     /// std = sqrt(1/N * sum((x - mean)^2))
-    /// @param data 
-    /// @param len 
-    /// @return 
-    float math_std(float* data, int len)
+    /// @param data
+    /// @param len
+    /// @return
+    float math_std(float *data, int len)
     {
         float std = 0.0f;
         float mean = math_mean(data, len);
@@ -44,7 +44,7 @@ extern "C"
         return std;
     }
 
-    float math_rms(float* data, int len)
+    float math_rms(float *data, int len)
     {
         float rms = 0.0f;
         for (int i = 0; i < len; i++)
@@ -56,33 +56,39 @@ extern "C"
         return rms;
     }
 
-    bool math_lin_interpolate(const float* originalData, int originalSize, float* newData, int newSize)
+    bool math_lin_interpolate(const float *originalData, int originalSize, float *newData, int newSize)
     {
-        if (originalSize < 2 || newSize < 2) {
+        if (originalSize < 2 || newSize < 2)
+        {
             return false;
         }
-        if (originalSize == newSize) {
+        if (originalSize == newSize)
+        {
             memcpy(newData, originalData, originalSize * sizeof(float));
             return true;
         }
-        for (int i = 0; i < newSize; ++i) {
+        for (int i = 0; i < newSize; ++i)
+        {
             double pos = ((double)i * (originalSize - 1)) / (newSize - 1);
             int posInt = (int)pos;
             double frac = pos - posInt;
 
-            if (posInt >= originalSize - 1) {
+            if (posInt >= originalSize - 1)
+            {
                 newData[i] = originalData[originalSize - 1];
             }
-            else {
+            else
+            {
                 newData[i] = (1 - frac) * originalData[posInt] + frac * originalData[posInt + 1];
             }
         }
         return true;
     }
 
-    float math_correlate(const float* data1, const float* data2, int size)
+    float math_correlate(const float *data1, const float *data2, int size)
     {
-        if (size < 2) {
+        if (size < 2)
+        {
             // Not enough data to compute correlation
             return 0.0f;
         }
@@ -92,7 +98,8 @@ extern "C"
         int i;
 
         // Calculate means of the two datasets
-        for (i = 0; i < size; i++) {
+        for (i = 0; i < size; i++)
+        {
             mean1 += data1[i];
             mean2 += data2[i];
         }
@@ -100,7 +107,8 @@ extern "C"
         mean2 /= size;
 
         // Calculate standard deviations and covariance
-        for (i = 0; i < size; i++) {
+        for (i = 0; i < size; i++)
+        {
             double delta1 = data1[i] - mean1;
             double delta2 = data2[i] - mean2;
             sum1 += delta1 * delta1;
@@ -113,76 +121,85 @@ extern "C"
         double stdev2 = sqrt(sum2 / (size - 1));
 
         // Protect against division by zero
-        if (stdev1 < DBL_EPSILON || stdev2 < DBL_EPSILON) {
+        if (stdev1 < DBL_EPSILON || stdev2 < DBL_EPSILON)
+        {
             return 0.0f;
         }
 
         return (float)(sumProduct / ((size - 1) * stdev1 * stdev2));
     }
 
-    void math_normalize(float* data, int size)
+    void math_normalize(float *data, int size)
     {
         float min = data[0];
         float max = data[0];
-        for (int i = 1; i < size; i++) {
-            if (data[i] < min) {
+        for (int i = 1; i < size; i++)
+        {
+            if (data[i] < min)
+            {
                 min = data[i];
             }
-            if (data[i] > max) {
+            if (data[i] > max)
+            {
                 max = data[i];
             }
         }
         float range = max - min;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
+        {
             data[i] = (data[i] - min) / range;
         }
     }
 
-
-    void math_zscore(float* data, int size)
+    void math_zscore(float *data, int size)
     {
         float mean = math_mean(data, size);
         float std = math_std(data, size);
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
+        {
             data[i] = (data[i] - mean) / std;
         }
     }
 
-
-    void math_remove_dc(float* data, int size)
+    void math_remove_dc(float *data, int size)
     {
         float mean = math_mean(data, size);
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
+        {
             data[i] -= mean;
         }
     }
 
-
-    void math_scale_to_range(float* data, int size, float min, float max)
+    void math_scale_to_range(float *data, int size, float min, float max)
     {
         float dataMin = data[0];
         float dataMax = data[0];
-        for (int i = 1; i < size; i++) {
-            if (data[i] < dataMin) {
+        for (int i = 1; i < size; i++)
+        {
+            if (data[i] < dataMin)
+            {
                 dataMin = data[i];
             }
-            if (data[i] > dataMax) {
+            if (data[i] > dataMax)
+            {
                 dataMax = data[i];
             }
         }
         float dataRange = dataMax - dataMin;
         float scale = (max - min) / dataRange;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
+        {
             data[i] = (data[i] - dataMin) * scale + min;
         }
     }
 
-    float math_slope(float* x, float* y, int n)
+    float math_slope(float *x, float *y, int n)
     {
         float sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x_squared = 0.0;
 
         // Calculate the sums needed for the slope formula
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
+        {
             sum_x += x[i];
             sum_y += y[i];
             sum_xy += x[i] * y[i];
@@ -195,13 +212,14 @@ extern "C"
         return slope;
     }
 
-    float math_vslope(vector2_t* v, int n)
+    float math_vslope(vector2_t *v, int n)
     {
         float sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x_squared = 0.0;
 
         // Calculate the sums needed for the slope formula
-        for (int i = 0; i < n; i++) {
-            vector2_t* v2 = &v[i];
+        for (int i = 0; i < n; i++)
+        {
+            vector2_t *v2 = &v[i];
             sum_x += v2->x;
             sum_y += v2->y;
             sum_xy += v2->x * v2->y;
@@ -213,6 +231,16 @@ extern "C"
 
         return slope;
     }
+
+    bool math_zero_cross_x(vector2_t *a, vector2_t *b, float *x)
+    {
+        // Ensure one y is above zero and one is below zero
+        if ((a->y > 0 && b->y < 0) || (a->y < 0 && b->y > 0))
+        {
+            // Linear interpolation to find zero crossing x
+            *x = a->x + (b->x - a->x) * (-a->y) / (b->y - a->y);
+            return true;
+        }
+        return false;
+    }
 } // extern "C"
-
-

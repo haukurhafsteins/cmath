@@ -36,6 +36,8 @@ void math_remove_dc(float *data, int size);
 /// @return The slope of the line
 float math_slope(float *x, float *y, int n);
 float math_vslope(vector2_t *v, int n);
+bool math_zero_cross_x(vector2_t *a, vector2_t *b, float *x);
+
 
 
 #ifdef __cplusplus
