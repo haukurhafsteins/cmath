@@ -4,6 +4,7 @@
 #include "math.h"
 #include "cmath.h"
 #include "vectors.h"
+#include "Quaternion.hpp"
 
 extern "C"
 {
